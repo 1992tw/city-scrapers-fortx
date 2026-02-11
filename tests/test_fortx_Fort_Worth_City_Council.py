@@ -46,7 +46,10 @@ mock_response.text = detail_page_html
 
 parsed_items = []
 
-with patch("city_scrapers.spiders.fortx_Fort_Worth_City_Council.requests.get", return_value=mock_response):  # noqa
+with patch(
+    "city_scrapers.spiders.fortx_Fort_Worth_City_Council.requests.get",
+    return_value=mock_response,
+):  # noqa
     for req in spider.parse(meetings_items):
         if isinstance(req, scrapy.Request):
             meeting_detail_item = spider.parse_meeting(
