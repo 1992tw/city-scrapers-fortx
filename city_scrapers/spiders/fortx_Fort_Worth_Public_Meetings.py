@@ -89,7 +89,7 @@ class FortxFortWorthPublicMeetingsSpider(CityScrapersSpider):
             title=meeting_data["Title"],
             description=self._parse_description(meeting_data),
             classification=CITY_COUNCIL,
-            start=dateparse(item["DateTime"]),
+            start=dateparse(item["DateTime"], dayfirst=True),
             end=None,
             all_day=False,
             time_notes="Please check the meeting description for details on the start time",  # noqa
@@ -134,21 +134,24 @@ class FortxFortWorthPublicMeetingsSpider(CityScrapersSpider):
         API endpoint requires the dates to be within the same year.
         This means it can't be used to fetch meetings spanning months
         from different years. This method constructs start and end date
-        ranges from the current date to 6 months in the past and 6 months
-        in the future.
+        ranges covering 6 months in the past through the end of the
+        current year, splitting into separate payloads per year.
         """
         past = current_date - relativedelta(months=6)
-        future = current_date + relativedelta(months=6)
 
         payloads = []
 
+        # First payload: from 6 months ago to end of that year
         first_payload = self.meetings_url_payload.copy()
-        first_payload["StartDate"] = str(past)
-        first_payload["EndDate"] = str(past.replace(month=12, day=31))
-        second_payload = self.meetings_url_payload.copy()
-        second_payload["StartDate"] = str(future.replace(month=1, day=1))
-        second_payload["EndDate"] = str(future)
+        first_payload["StartDate"] = past.strftime("%Y-%m-%d")
+        first_payload["EndDate"] = f"{past.year}-12-31"
         payloads.append(first_payload)
-        payloads.append(second_payload)
+
+        # Second payload: full current year (only needed if it differs from past year)
+        if current_date.year != past.year:
+            second_payload = self.meetings_url_payload.copy()
+            second_payload["StartDate"] = f"{current_date.year}-01-01"
+            second_payload["EndDate"] = f"{current_date.year}-12-31"
+            payloads.append(second_payload)
 
         return payloads
