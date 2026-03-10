@@ -139,19 +139,18 @@ class FortxFortWorthPublicMeetingsSpider(CityScrapersSpider):
         """
         past = current_date - relativedelta(months=6)
 
-        payloads = []
+        def _create_payload(start_date, end_date):
+            payload = self.meetings_url_payload.copy()
+            payload["StartDate"] = start_date
+            payload["EndDate"] = end_date
+            return payload
 
-        # First payload: from 6 months ago to end of that year
-        first_payload = self.meetings_url_payload.copy()
-        first_payload["StartDate"] = past.strftime("%Y-%m-%d")
-        first_payload["EndDate"] = f"{past.year}-12-31"
-        payloads.append(first_payload)
+        payloads = [_create_payload(past.strftime("%Y-%m-%d"), f"{past.year}-12-31")]
 
-        # Second payload: full current year (only needed if it differs from past year)
+        # Add current year if it differs from the past year
         if current_date.year != past.year:
-            second_payload = self.meetings_url_payload.copy()
-            second_payload["StartDate"] = f"{current_date.year}-01-01"
-            second_payload["EndDate"] = f"{current_date.year}-12-31"
-            payloads.append(second_payload)
+            payloads.append(
+                _create_payload(f"{current_date.year}-01-01", f"{current_date.year}-12-31")
+            )
 
         return payloads
