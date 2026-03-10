@@ -42,7 +42,7 @@ parsed_items = []
 for req in spider.parse(meetings_items):
     if isinstance(req, scrapy.Request):
         meeting_detail_item = spider.parse_meeting(
-            meetings_detail, req.cb_kwargs["item"]
+            meetings_detail, start_time=req.cb_kwargs["start_time"]
         )
         parsed_items.extend(meeting_detail_item)
 
