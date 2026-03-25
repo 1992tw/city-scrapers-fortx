@@ -140,7 +140,7 @@ class FortxFortWorthPublicMeetingsSpider(CityScrapersSpider):
         if not name and not address:
             return {"name": "WebEx", "address": "WebEx"}
         return {"name": name, "address": address}
-    
+
     def _parse_links(self, meeing_data):
         if href := meeing_data["Link"]:
             return [
