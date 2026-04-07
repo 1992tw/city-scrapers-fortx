@@ -6,7 +6,6 @@ import scrapy
 from city_scrapers_core.constants import CANCELLED, CITY_COUNCIL, PASSED, TENTATIVE
 from city_scrapers_core.items import Meeting
 from city_scrapers_core.spiders import CityScrapersSpider
-from dateutil.relativedelta import relativedelta
 
 
 class FortxFortWorthPublicMeetingsSpider(CityScrapersSpider):
